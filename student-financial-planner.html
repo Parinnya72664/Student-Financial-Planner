@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>ปันเงิน — เครื่องมือวางแผนการเงินนักศึกษา</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Mitr:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FBFEFB;
+    --bg-soft:#EFF8F1;
+    --paper:#FFFFFF;
+    --ink:#3C2E22;
+    --ink-soft:#A9855F;
+    --moss:#17C287;
+    --moss-deep:#0C9668;
+    --gold:#FFA820;
+    --gold-soft:#FFE39C;
+    --brick:#FF5F6D;
+    --brick-soft:#FFDAD4;
+    --pink:#FF6FA8;
+    --line:#E7EFE4;
+    --radius-lg:26px;
+    --radius-sm:14px;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#221A12; --paper:#2C2118; --ink:#FBEEE0; --ink-soft:#D4AE7E;
+      --line:#43331F; --gold-soft:#4A3616; --brick-soft:#4A241F; --bg-soft:#2C2118;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#221A12; --paper:#2C2118; --ink:#FBEEE0; --ink-soft:#D4AE7E;
+    --line:#43331F; --gold-soft:#4A3616; --brick-soft:#4A241F; --bg-soft:#2C2118;
+  }
+  *{margin:0;box-sizing:border-box;}
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Sarabun',sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:980px;margin:0 auto;padding:28px 20px 80px;}
+  header.top{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;padding:14px 4px 34px;flex-wrap:wrap;}
+  .brand{display:flex;align-items:center;gap:12px;}
+  .brand .mark{
+    width:50px;height:50px;border-radius:50%;background:var(--moss);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+    box-shadow:0 6px 14px -4px rgba(63,190,140,.55);
+    animation:pop .6s cubic-bezier(.34,1.56,.64,1);
+  }
+  .brand .mark svg{width:28px;height:28px;}
+  @keyframes pop{ 0%{transform:scale(.4) rotate(-8deg); opacity:0;} 100%{transform:scale(1) rotate(0); opacity:1;} }
+  body{position:relative;overflow-x:hidden;}
+  body::before, body::after{
+    content:"";position:fixed;border-radius:50%;filter:blur(2px);z-index:-1;opacity:.7;pointer-events:none;
+  }
+  body::before{width:260px;height:260px;background:var(--gold-soft);top:-90px;right:-70px;}
+  body::after{width:220px;height:220px;background:var(--pink);opacity:.25;bottom:-80px;left:-60px;}
+  @media (prefers-reduced-motion: reduce){ .brand .mark{animation:none;} }
+  .brand h1{font-family:'Mitr',sans-serif;font-size:22px;font-weight:600;letter-spacing:.2px;}
+  .brand p{font-size:13.5px;color:var(--ink-soft);margin-top:1px;}
+  .month-tag{font-size:13.5px;color:var(--ink-soft);border:1px solid var(--line);padding:7px 14px;border-radius:99px;}
+
+  h2.section-title{
+    font-family:'Mitr',sans-serif;font-weight:600;font-size:19px;
+    margin-bottom:4px;
+  }
+  .section-sub{color:var(--ink-soft);font-size:14px;margin-bottom:20px;max-width:60ch;}
+  section{margin-bottom:52px;}
+
+  .hero-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:26px;align-items:start;}
+  @media (max-width:760px){ .hero-grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--paper);border:1px solid var(--line);
+    border-radius:var(--radius-lg);padding:24px;
+  }
+
+  .field-row{display:grid;grid-template-columns:1fr 128px;gap:10px;align-items:center;margin-bottom:12px;}
+  .field-row label{font-size:14.5px;}
+  .field-row .hint{display:block;font-size:12px;color:var(--ink-soft);margin-top:1px;}
+  input[type=number], input[type=text]{
+    width:100%;padding:9px 12px;border-radius:12px;
+    border:1.5px solid var(--line);background:transparent;color:var(--ink);
+    font-family:'Sarabun',sans-serif;font-size:14.5px;text-align:right;
+    transition:border-color .15s;
+  }
+  input[type=number]:hover, input[type=text]:hover{border-color:var(--moss);}
+  input[type=text]{text-align:left;}
+  input:focus-visible, button:focus-visible, textarea:focus-visible{
+    outline:2px solid var(--moss); outline-offset:2px;
+  }
+  .divider{height:1px;background:var(--line);margin:16px 0;}
+  .income-row input{border-color:var(--moss);}
+
+  .tx-type-toggle{display:flex;gap:8px;margin-bottom:14px;}
+  .tx-type-btn{
+    flex:1;padding:9px 0;border-radius:12px;border:1.5px solid var(--line);
+    background:transparent;color:var(--ink-soft);font-family:'Sarabun',sans-serif;
+    font-size:14px;font-weight:600;cursor:pointer;transition:all .15s;
+  }
+  .tx-type-btn.active[data-type="expense"]{background:var(--brick-soft);border-color:var(--brick);color:#B24A38;}
+  .tx-type-btn.active[data-type="income"]{background:#DBF3E6;border-color:var(--moss);color:var(--moss-deep);}
+  :root[data-theme="dark"] .tx-type-btn.active[data-type="income"]{background:#1D3A2C;color:#8FD9AE;}
+  .tx-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .tx-field label{display:block;font-size:12.5px;color:var(--ink-soft);margin-bottom:4px;}
+  .tx-field select{
+    width:100%;padding:9px 11px;border-radius:12px;border:1.5px solid var(--line);
+    background:transparent;color:var(--ink);font-family:'Sarabun',sans-serif;font-size:14px;
+  }
+  .tx-field input{text-align:left;}
+  #catField.hidden{display:none;}
+
+  .tx-list{display:flex;flex-direction:column;gap:8px;max-height:260px;overflow-y:auto;padding-right:2px;}
+  .tx-row{
+    display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:14px;
+    background:var(--bg-soft);border:1px solid var(--line);
+  }
+  .tx-row .dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+  .tx-row .info{flex:1;min-width:0;}
+  .tx-row .info .desc{font-size:13.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tx-row .info .cat{font-size:11.5px;color:var(--ink-soft);}
+  .tx-row .amt{font-size:14px;font-weight:600;white-space:nowrap;}
+  .tx-row .amt.income{color:var(--moss-deep);}
+  .tx-row .amt.expense{color:var(--ink);}
+  .tx-row .del{
+    width:26px;height:26px;border-radius:50%;border:none;background:var(--brick-soft);
+    color:#B24A38;font-size:14px;line-height:1;cursor:pointer;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .tx-row .del:hover{background:var(--brick);color:#fff;}
+  .tx-empty{font-size:13.5px;color:var(--ink-soft);text-align:center;padding:18px 6px;display:none;}
+  .tx-empty.show{display:block;}
+
+  #resultPanel{animation:riseIn .5s .1s cubic-bezier(.22,1,.36,1) both;}
+  @keyframes riseIn{ from{opacity:0; transform:translateY(14px);} to{opacity:1; transform:translateY(0);} }
+  @media (prefers-reduced-motion: reduce){ #resultPanel{animation:none;} }
+  .hero-figure{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;}
+  .save-amount{
+    font-family:'Mitr',sans-serif;font-weight:700;font-size:44px;color:var(--moss-deep);
+    line-height:1;
+  }
+  :root[data-theme="dark"] .save-amount, body:not([data-theme]) .save-amount{ }
+  @media (prefers-color-scheme:dark){ :root:not([data-theme="light"]) .save-amount{color:#8FD9AE;} }
+  :root[data-theme="dark"] .save-amount{color:#8FD9AE;}
+  .save-label{font-size:14px;color:var(--ink-soft);}
+  .save-rate{
+    margin-top:10px;font-size:13.5px;padding:5px 13px;border-radius:99px;
+    background:var(--gold-soft);color:#7A5311;
+  }
+  :root[data-theme="dark"] .save-rate{color:#F4DDA6;}
+  .over-flag .save-rate{background:var(--brick-soft);color:#7A2C21;}
+  :root[data-theme="dark"] .over-flag .save-rate{color:#F3C2B8;}
+
+  .donut-wrap{display:flex;justify-content:center;margin:18px 0 6px;}
+  .legend{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
+  .legend .row{display:flex;align-items:center;gap:9px;font-size:13.5px;}
+  .legend .swatch{width:11px;height:11px;border-radius:3px;flex-shrink:0;}
+  .legend .amt{margin-left:auto;color:var(--ink-soft);}
+
+  .alert-banner{
+    display:none;align-items:flex-start;gap:12px;background:var(--brick-soft);
+    border:1px solid #E3B3A9;border-radius:var(--radius-sm);padding:14px 16px;margin-top:16px;
+  }
+  .alert-banner.show{display:flex;}
+  .alert-banner b{color:#7A2C21;}
+  :root[data-theme="dark"] .alert-banner b{color:#F3C2B8;}
+
+  .goal-grid{display:grid;grid-template-columns:1fr 1fr;gap:26px;}
+  @media (max-width:760px){ .goal-grid{grid-template-columns:1fr;} }
+  .goal-list{display:flex;flex-direction:column;gap:14px;max-height:360px;overflow-y:auto;padding-right:2px;}
+  .goal-card{border:1px solid var(--line);border-radius:16px;padding:14px 16px;background:var(--bg-soft);}
+  .goal-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:4px;}
+  .goal-card-title{font-family:'Mitr',sans-serif;font-weight:600;font-size:14.5px;}
+  .goal-card .del{
+    width:26px;height:26px;border-radius:50%;border:none;background:var(--brick-soft);
+    color:#B24A38;font-size:13px;line-height:1;cursor:pointer;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .goal-card .del:hover{background:var(--brick);color:#fff;}
+  .progress-track{height:10px;border-radius:99px;background:var(--line);overflow:hidden;margin:14px 0 8px;}
+  .progress-fill{height:100%;background:var(--gold);border-radius:99px;width:0%;transition:width .5s ease;}
+  .goal-msg{font-size:14px;color:var(--ink-soft);}
+  .goal-msg.ok{color:var(--moss-deep);}
+  :root[data-theme="dark"] .goal-msg.ok{color:#8FD9AE;}
+  .goal-msg.warn{color:#7A2C21;}
+  :root[data-theme="dark"] .goal-msg.warn{color:#F3C2B8;}
+
+  button.primary{
+    background:var(--moss);color:#fff;border:none;border-radius:var(--radius-sm);
+    padding:11px 20px;font-family:'Sarabun',sans-serif;font-weight:600;font-size:14.5px;
+    cursor:pointer;
+  }
+  button.primary:hover{background:var(--moss-deep);}
+
+  .chat-panel{display:flex;flex-direction:column;height:440px;}
+  .chat-persona{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .chat-persona .avatar{
+    width:38px;height:38px;border-radius:50%;background:var(--gold-soft);
+    display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+  }
+  .chat-persona b{font-family:'Mitr',sans-serif;font-size:15px;}
+  .chat-persona span{display:block;font-size:12.5px;color:var(--ink-soft);}
+  .chat-log{flex:1;overflow-y:auto;padding:4px 2px;display:flex;flex-direction:column;gap:10px;}
+  .msg{max-width:82%;padding:10px 13px;border-radius:14px;font-size:14px;line-height:1.55;}
+  .msg.bot{background:var(--bg-soft);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:4px;}
+  .msg.user{background:var(--moss);color:#fff;align-self:flex-end;border-bottom-right-radius:4px;}
+  .chat-input-row{display:flex;gap:8px;margin-top:12px;}
+  .chat-input-row input{flex:1;text-align:left;}
+  .chat-input-row button{
+    background:var(--moss);color:#fff;border:none;border-radius:var(--radius-sm);
+    padding:0 18px;font-size:14px;cursor:pointer;flex-shrink:0;
+  }
+  .chat-input-row button:disabled{opacity:.5;cursor:default;}
+  .suggest-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px;}
+  .chip{
+    font-size:12.5px;border:1px solid var(--line);border-radius:99px;padding:5px 12px;
+    cursor:pointer;color:var(--ink-soft);background:transparent;
+  }
+  .chip:hover{border-color:var(--moss);color:var(--moss);}
+  .typing{display:flex;gap:4px;padding:2px 4px;}
+  .typing span{width:6px;height:6px;border-radius:50%;background:var(--ink-soft);opacity:.5;animation:blink 1.1s infinite;}
+  .typing span:nth-child(2){animation-delay:.15s;} .typing span:nth-child(3){animation-delay:.3s;}
+  @keyframes blink{0%,80%,100%{opacity:.3;transform:translateY(0)} 40%{opacity:.9;transform:translateY(-2px)}}
+  @media (prefers-reduced-motion: reduce){ .typing span{animation:none;} .progress-fill{transition:none;} }
+
+  footer{text-align:center;color:var(--ink-soft);font-size:12.5px;padding-top:10px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div class="brand">
+      <div class="mark">
+        <svg viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="13" rx="8" ry="6.5" fill="#fff"/><circle cx="17.5" cy="9.5" r="1.6" fill="#fff"/><path d="M4.5 12.5 2 11" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><path d="M12 6.5c1-1 2.6-1.4 3.8-.7" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/><circle cx="15" cy="12.5" r="1" fill="#3FBE8C"/><rect x="10.4" y="8.7" width="3.2" height="1.1" rx="0.5" fill="#3FBE8C"/><path d="M9 16.5v2M15 16.5v2" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>
+      </div>
+      <div>
+        <h1>ปันเงิน</h1>
+        <p>เครื่องมือช่วยคำนวณและวางแผนการเงินสำหรับนักศึกษา</p>
+      </div>
+    </div>
+    <div class="month-tag" id="monthTag">รายเดือน</div>
+  </header>
+
+  <section id="calc">
+    <h2 class="section-title">บันทึกรายรับ-รายจ่าย</h2>
+    <p class="section-sub">เพิ่มรายการทีละรายการ ระบบจะเก็บเป็นลิสต์ให้ดูง่าย แก้ไขได้ด้วยการลบแล้วเพิ่มใหม่ และคำนวณเงินออมให้ทันที</p>
+
+    <div class="hero-grid">
+      <div class="panel">
+        <form id="txForm">
+          <div class="tx-type-toggle" role="group" aria-label="ประเภทรายการ">
+            <button type="button" class="tx-type-btn active" data-type="expense">รายจ่าย</button>
+            <button type="button" class="tx-type-btn" data-type="income">รายรับ</button>
+          </div>
+          <div class="tx-form-grid">
+            <div class="tx-field" id="catField">
+              <label for="txCategory">หมวดหมู่</label>
+              <select id="txCategory"></select>
+            </div>
+            <div class="tx-field" style="grid-column:span 2">
+              <label for="txDesc">รายละเอียด (ไม่บังคับ)</label>
+              <input type="text" id="txDesc" placeholder="เช่น ข้าวมื้อเที่ยง">
+            </div>
+            <div class="tx-field">
+              <label for="txAmount">จำนวนเงิน</label>
+              <input type="number" id="txAmount" min="0" placeholder="0" inputmode="numeric">
+            </div>
+          </div>
+          <button type="submit" class="primary" id="txAddBtn" style="width:100%;margin-top:12px;">+ เพิ่มรายการ</button>
+        </form>
+        <div class="divider"></div>
+        <div class="tx-list" id="txList"></div>
+        <p class="tx-empty" id="txEmpty">ยังไม่มีรายการ ลองเพิ่มรายการแรกของคุณด้านบนได้เลย 🌱</p>
+      </div>
+
+      <div class="panel" id="resultPanel">
+        <div class="hero-figure">
+          <span class="save-label">เงินคงเหลือ / ออมได้ต่อเดือน</span>
+          <span class="save-amount" id="saveAmount">฿0</span>
+          <span class="save-rate" id="saveRate">ออมได้ 0% ของรายรับ</span>
+        </div>
+        <div class="donut-wrap">
+          <svg id="donut" width="180" height="180" viewBox="0 0 180 180"></svg>
+        </div>
+        <div class="legend" id="legend"></div>
+        <div class="alert-banner" id="alertBanner">
+          <span style="font-size:18px;line-height:1">⚠️</span>
+          <div><b>ใช้เงินเกินรายรับ</b><br>ลองลดหมวดที่ใช้เยอะที่สุดลงก่อน หรือคุยกับที่ปรึกษาด้านล่างเพื่อขอคำแนะนำ</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="goal">
+    <h2 class="section-title">เป้าหมายการออม</h2>
+    <p class="section-sub">อยากซื้ออะไรสักอย่าง? เพิ่มเป้าหมายได้หลายรายการ ระบบจะเช็กให้ว่าเงินออมตอนนี้พอกับเป้าไหน แล้วลบออกได้เมื่อซื้อสำเร็จแล้ว</p>
+    <div class="goal-grid">
+      <div class="panel">
+        <form id="goalForm">
+          <div class="tx-field"><label for="goalName">ของที่อยากได้</label><input type="text" id="goalName" placeholder="เช่น หูฟังไร้สาย" required></div>
+          <div class="tx-form-grid" style="margin-top:10px;">
+            <div class="tx-field"><label for="goalPrice">ราคา (บาท)</label><input type="number" id="goalPrice" min="0" placeholder="0" inputmode="numeric"></div>
+            <div class="tx-field"><label for="goalMonths">ภายใน (เดือน)</label><input type="number" id="goalMonths" min="1" placeholder="1" inputmode="numeric"></div>
+          </div>
+          <button type="submit" class="primary" style="width:100%;margin-top:12px;">+ เพิ่มเป้าหมาย</button>
+        </form>
+      </div>
+      <div class="panel">
+        <div class="goal-list" id="goalList"></div>
+        <p class="tx-empty" id="goalEmpty">ยังไม่มีเป้าหมาย ลองเพิ่มของที่อยากได้ด้านซ้ายดูสิ 🎯</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="chat">
+    <h2 class="section-title">คุยกับที่ปรึกษาการเงิน</h2>
+    <p class="section-sub">ถามอะไรก็ได้เกี่ยวกับการจัดการเงินแบบนักศึกษา ระบบจะอ้างอิงตัวเลขที่คุณกรอกไว้ด้านบนให้อัตโนมัติ</p>
+    <div class="panel chat-panel">
+      <div class="chat-persona">
+        <div class="avatar">🌿</div>
+        <div><b>พี่ปัน</b><span>ที่ปรึกษาการเงินส่วนตัวสำหรับนักศึกษา</span></div>
+      </div>
+      <div class="chat-log" id="chatLog"></div>
+      <div class="suggest-chips">
+        <button class="chip" data-q="เดือนนี้ควรลดค่าใช้จ่ายหมวดไหนก่อน">ควรลดหมวดไหนก่อน?</button>
+        <button class="chip" data-q="แบ่งเงินแบบ 50/30/20 ให้หน่อย">แบ่งเงินแบบ 50/30/20</button>
+        <button class="chip" data-q="ถ้าอยากออมเผื่อฉุกเฉินควรเริ่มยังไง">ออมเงินฉุกเฉินยังไงดี</button>
+      </div>
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" placeholder="พิมพ์คำถามเกี่ยวกับการเงิน...">
+        <button id="chatSend">ส่ง</button>
+      </div>
+    </div>
+  </section>
+
+  <footer>ปันเงิน · เครื่องมือช่วยวางแผนการเงินสำหรับนักศึกษา · คำแนะนำจาก AI เป็นข้อมูลเบื้องต้น ไม่ใช่คำปรึกษาการเงินอย่างเป็นทางการ</footer>
+</div>
+
+<script>
+const THB = n => '฿' + Math.round(n).toLocaleString('th-TH');
+const cats = [
+  {id:'e_rent', name:'ที่พัก', color:'#17C287'},
+  {id:'e_food', name:'อาหาร', color:'#FFA820'},
+  {id:'e_travel', name:'เดินทาง', color:'#3DB8F5'},
+  {id:'e_study', name:'การเรียน', color:'#9B7BFF'},
+  {id:'e_fun', name:'บันเทิง', color:'#FF6FA8'},
+  {id:'e_other', name:'อื่นๆ', color:'#FF8A50'},
+];
+const monthNames=['มกราคม','กุมภาพันธ์','มีนาคม','เมษายน','พฤษภาคม','มิถุนายน','กรกฎาคม','สิงหาคม','กันยายน','ตุลาคม','พฤศจิกายน','ธันวาคม'];
+document.getElementById('monthTag').textContent = monthNames[new Date().getMonth()] + ' ' + (new Date().getFullYear()+543);
+
+const catSelect = document.getElementById('txCategory');
+cats.forEach(c=>{
+  const opt=document.createElement('option'); opt.value=c.id; opt.textContent=c.name;
+  catSelect.appendChild(opt);
+});
+
+let txId = 0;
+let transactions = [
+  {id:txId++, type:'income', category:null, desc:'ค่าขนม/รายได้พิเศษ', amount:8000},
+  {id:txId++, type:'expense', category:'e_rent', desc:'ค่าหอเดือนนี้', amount:2500},
+  {id:txId++, type:'expense', category:'e_food', desc:'ค่าอาหารทั้งเดือน', amount:2800},
+  {id:txId++, type:'expense', category:'e_travel', desc:'ค่ารถ/น้ำมัน', amount:600},
+  {id:txId++, type:'expense', category:'e_study', desc:'หนังสือ/คอร์สเรียน', amount:400},
+  {id:txId++, type:'expense', category:'e_fun', desc:'สังสรรค์เพื่อน', amount:700},
+  {id:txId++, type:'expense', category:'e_other', desc:'จิปาถะ', amount:300},
+];
+
+let currentType = 'expense';
+document.querySelectorAll('.tx-type-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    currentType = btn.dataset.type;
+    document.querySelectorAll('.tx-type-btn').forEach(b=>b.classList.toggle('active', b===btn));
+    document.getElementById('catField').classList.toggle('hidden', currentType==='income');
+  });
+});
+
+document.getElementById('txForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const amount = Math.max(0, Number(document.getElementById('txAmount').value) || 0);
+  if(amount<=0) return;
+  const desc = document.getElementById('txDesc').value.trim();
+  const category = currentType==='expense' ? document.getElementById('txCategory').value : null;
+  transactions.push({id:txId++, type:currentType, category, desc, amount});
+  document.getElementById('txAmount').value='';
+  document.getElementById('txDesc').value='';
+  document.getElementById('txDesc').focus();
+  render();
+});
+
+function deleteTx(id){
+  transactions = transactions.filter(t=>t.id!==id);
+  render();
+}
+
+function renderTxList(){
+  const list = document.getElementById('txList');
+  const empty = document.getElementById('txEmpty');
+  list.innerHTML='';
+  empty.classList.toggle('show', transactions.length===0);
+  [...transactions].reverse().forEach(t=>{
+    const cat = t.type==='expense' ? cats.find(c=>c.id===t.category) : null;
+    const row = document.createElement('div'); row.className='tx-row';
+    const dotColor = t.type==='income' ? 'var(--moss)' : (cat ? cat.color : 'var(--ink-soft)');
+    const label = t.desc || (t.type==='income' ? 'รายรับ' : (cat ? cat.name : 'รายจ่าย'));
+    const catTag = t.type==='income' ? 'รายรับ' : (cat ? cat.name : '');
+    row.innerHTML = `
+      <span class="dot" style="background:${dotColor}"></span>
+      <div class="info"><div class="desc">${label}</div><div class="cat">${catTag}</div></div>
+      <span class="amt ${t.type}">${t.type==='income'?'+':'-'}${THB(t.amount)}</span>
+      <button class="del" aria-label="ลบรายการ" data-id="${t.id}">✕</button>`;
+    list.appendChild(row);
+  });
+  list.querySelectorAll('.del').forEach(btn=>{
+    btn.addEventListener('click', ()=>deleteTx(Number(btn.dataset.id)));
+  });
+}
+
+function polar(cx,cy,r,angle){
+  const rad=(angle-90)*Math.PI/180;
+  return {x:cx+r*Math.cos(rad), y:cy+r*Math.sin(rad)};
+}
+function arcPath(cx,cy,r,startAngle,endAngle){
+  const s=polar(cx,cy,r,endAngle), e=polar(cx,cy,r,startAngle);
+  const large = endAngle-startAngle>180?1:0;
+  return `M ${cx} ${cy} L ${e.x} ${e.y} A ${r} ${r} 0 ${large} 1 ${s.x} ${s.y} Z`;
+}
+
+function render(){
+  renderTxList();
+
+  const income = transactions.filter(t=>t.type==='income').reduce((a,t)=>a+t.amount,0);
+  const values = cats.map(c=>({
+    ...c,
+    val: transactions.filter(t=>t.type==='expense' && t.category===c.id).reduce((a,t)=>a+t.amount,0)
+  }));
+  const totalExpense = values.reduce((a,c)=>a+c.val,0);
+  const savings = income - totalExpense;
+  const over = savings < 0;
+
+  document.getElementById('saveAmount').textContent = THB(savings);
+  const rate = income>0 ? Math.round((savings/income)*100) : 0;
+  const rateEl = document.getElementById('saveRate');
+  const panel = document.getElementById('resultPanel');
+  panel.classList.toggle('over-flag', over);
+  rateEl.textContent = over ? `ใช้เกิน ${Math.abs(rate)}% ของรายรับ` : `ออมได้ ${rate}% ของรายรับ`;
+  document.getElementById('alertBanner').classList.toggle('show', over);
+
+  const donut = document.getElementById('donut');
+  donut.innerHTML='';
+  const cx=90, cy=90, r=72, rInner=44;
+  if(totalExpense<=0){
+    donut.innerHTML = `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="var(--line)" stroke-width="26"/>`;
+  } else {
+    let angle=0;
+    values.filter(v=>v.val>0).forEach(v=>{
+      const sweep = v.val/totalExpense*360;
+      const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d', arcPath(cx,cy,r,angle,angle+sweep));
+      path.setAttribute('fill', v.color);
+      donut.appendChild(path);
+      angle+=sweep;
+    });
+    const hole=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    hole.setAttribute('cx',cx); hole.setAttribute('cy',cy); hole.setAttribute('r',rInner);
+    hole.setAttribute('fill','var(--paper)');
+    donut.appendChild(hole);
+  }
+
+  const legend = document.getElementById('legend');
+  legend.innerHTML='';
+  values.filter(v=>v.val>0).sort((a,b)=>b.val-a.val).forEach(v=>{
+    const row=document.createElement('div'); row.className='row';
+    row.innerHTML = `<span class="swatch" style="background:${v.color}"></span>${v.name}<span class="amt">${THB(v.val)}</span>`;
+    legend.appendChild(row);
+  });
+
+  renderGoals(savings);
+  return {income, values, totalExpense, savings};
+}
+
+let goalId = 0;
+let goals = [
+  {id:goalId++, name:'หูฟังไร้สาย', price:3000, months:3},
+];
+
+document.getElementById('goalForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const name = document.getElementById('goalName').value.trim();
+  const price = Math.max(0, Number(document.getElementById('goalPrice').value) || 0);
+  const months = Math.max(1, Number(document.getElementById('goalMonths').value) || 1);
+  if(!name || price<=0) return;
+  goals.push({id:goalId++, name, price, months});
+  document.getElementById('goalForm').reset();
+  document.getElementById('goalName').focus();
+  render();
+});
+
+function deleteGoal(id){
+  goals = goals.filter(g=>g.id!==id);
+  render();
+}
+
+function renderGoals(savings){
+  const list = document.getElementById('goalList');
+  const empty = document.getElementById('goalEmpty');
+  list.innerHTML='';
+  empty.classList.toggle('show', goals.length===0);
+  [...goals].reverse().forEach(g=>{
+    const need = g.price/g.months;
+    const pct = savings>0 ? Math.min(100, Math.round((savings/need)*100)) : 0;
+    let msg, msgClass;
+    if(savings<=0){
+      msg = `ตอนนี้ไม่มีเงินออมเหลือ ต้องปรับรายจ่ายก่อนถึงจะเริ่มเก็บเป้าหมายนี้ได้`;
+      msgClass = 'warn';
+    } else if(savings>=need){
+      msg = `ออมพอ (ต้องการ ${THB(need)}/เดือน) — เก็บครบใน ${g.months} เดือนตามแผน`;
+      msgClass = 'ok';
+    } else {
+      const realMonths = Math.ceil(g.price/savings);
+      msg = `ต้องการ ${THB(need)}/เดือน แต่ออมได้จริง ${THB(savings)}/เดือน — จะครบใน ${realMonths} เดือนแทน`;
+      msgClass = 'warn';
+    }
+    const card = document.createElement('div'); card.className='goal-card';
+    card.innerHTML = `
+      <div class="goal-card-top">
+        <span class="goal-card-title">🎯 ${g.name} — ${THB(g.price)}</span>
+        <button class="del" aria-label="ลบเป้าหมาย" data-id="${g.id}">✕</button>
+      </div>
+      <div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div>
+      <p class="goal-msg ${msgClass}" style="margin:0;">${msg}</p>`;
+    list.appendChild(card);
+  });
+  list.querySelectorAll('.del').forEach(btn=>{
+    btn.addEventListener('click', ()=>deleteGoal(Number(btn.dataset.id)));
+  });
+}
+
+render();
+
+// --- AI advisor chat (Role/Persona + context-aware prompting) ---
+let claudeSample = null;
+(async () => {
+  try { claudeSample = await window.claude?.use?.('sample'); } catch(e) { claudeSample = null; }
+})();
+
+const chatLog = document.getElementById('chatLog');
+const chatInput = document.getElementById('chatInput');
+const chatSend = document.getElementById('chatSend');
+let history = [];
+
+function addMsg(role, text){
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role==='user'?'user':'bot');
+  div.textContent = text;
+  chatLog.appendChild(div);
+  chatLog.scrollTop = chatLog.scrollHeight;
+  return div;
+}
+addMsg('bot', 'สวัสดี! พี่ปันเป็นที่ปรึกษาการเงินสำหรับนักศึกษานะ ลองถามเรื่องการจัดสรรเงินได้เลย หรือกดคำถามแนะนำด้านล่างก็ได้ 🌱');
+
+function buildContext(){
+  const s = render();
+  const lines = s.values.filter(v=>v.val>0).map(v=>`${v.name} ${Math.round(v.val)} บาท`).join(', ');
+  return `รายรับ ${Math.round(s.income)} บาท/เดือน, รายจ่าย: ${lines || 'ยังไม่ได้กรอก'}, รวมรายจ่าย ${Math.round(s.totalExpense)} บาท, เงินคงเหลือ ${Math.round(s.savings)} บาท`;
+}
+
+function localFallback(question, ctx){
+  const s = render();
+  if(s.savings < 0){
+    return `จากตัวเลขที่กรอกไว้ (${ctx}) ตอนนี้ใช้จ่ายเกินรายรับอยู่ ${THB(Math.abs(s.savings))} แนะนำให้เริ่มลดหมวดที่ใช้เยอะที่สุดก่อน แล้วลองตั้งงบสูงสุดต่อหมวดในเดือนถัดไปดูนะ`;
+  }
+  return `จากตัวเลขที่กรอกไว้ (${ctx}) ตอนนี้ออมได้ประมาณ ${THB(s.savings)} ต่อเดือน ลองแบ่งเป็นเงินฉุกเฉินส่วนหนึ่งและเป้าหมายที่ตั้งไว้ส่วนหนึ่งดูได้ ถ้าอยากได้แผนละเอียดกว่านี้ลองถามคำถามที่เจาะจงขึ้นได้เลย`;
+}
+
+async function sendMessage(text){
+  if(!text.trim()) return;
+  addMsg('user', text);
+  chatInput.value='';
+  chatSend.disabled = true;
+  const typing = addMsg('bot','');
+  typing.innerHTML = '<div class="typing"><span></span><span></span><span></span></div>';
+
+  const ctx = buildContext();
+  history.push({role:'user', content:text});
+
+  const systemPersona = `คุณคือ "พี่ปัน" ที่ปรึกษาทางการเงินส่วนบุคคลสำหรับนักศึกษาไทย พูดจาเป็นกันเอง อบอุ่น ให้กำลังใจ ใช้ภาษาที่เข้าใจง่าย ไม่ใช้ศัพท์การเงินซับซ้อน ตอบสั้นกระชับ 2-4 ประโยค เน้นคำแนะนำที่ปฏิบัติได้จริงสำหรับนักศึกษาที่มีรายได้จำกัด ข้อมูลการเงินปัจจุบันของผู้ใช้คือ: ${ctx}`;
+
+  try {
+    if(claudeSample){
+      const messages = [{role:'user', content: systemPersona + '\\n\\nคำถามจากนักศึกษา: ' + text}];
+      const res = await claudeSample(messages, {modelTier:'quick', cache:false});
+      typing.remove();
+      addMsg('bot', res.text.trim());
+      history.push({role:'assistant', content:res.text});
+    } else {
+      await new Promise(r=>setTimeout(r, 500));
+      typing.remove();
+      const fb = localFallback(text, ctx);
+      addMsg('bot', fb);
+    }
+  } catch(err){
+    typing.remove();
+    addMsg('bot', localFallback(text, ctx));
+  }
+  chatSend.disabled = false;
+}
+
+chatSend.addEventListener('click', ()=>sendMessage(chatInput.value));
+chatInput.addEventListener('keydown', e=>{ if(e.key==='Enter') sendMessage(chatInput.value); });
+document.querySelectorAll('.chip').forEach(chip=>{
+  chip.addEventListener('click', ()=>sendMessage(chip.dataset.q));
+});
+</script>
+</body>
+</html>
